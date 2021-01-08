@@ -3,7 +3,6 @@ package steamcmd
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"sync"
 
@@ -19,9 +18,6 @@ var (
 type SteamCmd struct {
 	sync.Mutex // mutex for operations
 
-	SteamCmdDir string
-	AppBasePath string
-
 	LoginUser string
 	LoginPass string
 
@@ -30,9 +26,7 @@ type SteamCmd struct {
 
 // New creates a new steamcmd instance, if path is empty, a temporary
 // path will be created. Otherwise an existing instance will be reused.
-func New(user, pass) *SteamCmd {
-	var err error
-
+func New(user, pass string) *SteamCmd {
 	// if user not specified correctly, default to anonymous login
 	if user == "" || pass == "" {
 		user = "anonymous"
@@ -40,8 +34,6 @@ func New(user, pass) *SteamCmd {
 	}
 
 	scmd := &SteamCmd{
-		SteamCmdDir: path,
-		AppBasePath: gamesPath,
 		LoginUser:   user,
 		LoginPass:   pass,
 	}
@@ -59,11 +51,6 @@ func (scmd SteamCmd) CheckLogin() error {
 func (scmd SteamCmd) EnsureInstalled() error {
 	_, err := exec.LookPath("steamcmd")
 	return err
-}
-
-// GetAppPath returns the path where an app would be installed
-func (scmd *SteamCmd) GetAppPath(id int) string {
-	return filepath.Join(scmd.AppBasePath, strconv.Itoa(id))
 }
 
 // InstallUpdateApp installs and updates a given app
