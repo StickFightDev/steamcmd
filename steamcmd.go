@@ -65,6 +65,11 @@ func New(user, pass, path string) *SteamCmd {
 	return scmd
 }
 
+// CheckLogin checks if the given login can authenticate with Steam
+func (scmd SteamCmd) CheckLogin() error {
+	return scmd.run("")
+}
+
 // EnsureInstalled checks if the SteamCmd is executable, and bootstraps it otherwise.
 // Remember, steam needs curl, bzip2, tar and lib32gcc1
 func (scmd SteamCmd) EnsureInstalled() error {
