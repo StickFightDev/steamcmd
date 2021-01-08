@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/grunions/steamcmd"
+	"github.com/StickFightDev/steamcmd"
 )
 
 // AppHandler is the type of handler required to fetch the app, or gather information

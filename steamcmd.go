@@ -34,6 +34,12 @@ type SteamCmd struct {
 func New(user, pass, path string) *SteamCmd {
 	var err error
 
+	// if user not specified correctly, default to anonymous login
+	if user == "" || pass == "" {
+		user = "anonymous"
+		pass = ""
+	}
+
 	// if path was left empty, we create a temporary dir for steam
 	if path == "" {
 		path, err = ioutil.TempDir("", "steamcmd")
@@ -99,8 +105,7 @@ func (scmd *SteamCmd) GetAppPath(id int) string {
 
 // InstallUpdateApp installs and updates a given app
 func (scmd *SteamCmd) InstallUpdateApp(id int) error {
-	return scmd.run("+login", "anonymous",
-		"+force_install_dir", scmd.GetAppPath(id),
+	return scmd.run("+force_install_dir", scmd.GetAppPath(id),
 		"+app_update", strconv.Itoa(id), "validate")
 }
 
@@ -117,12 +122,20 @@ func (scmd *SteamCmd) AppAvailableVersion(id int) (int, error) {
 
 // DownloadWorkshopMod tries to download a mod from the workshop
 func (scmd *SteamCmd) DownloadWorkshopMod(appid, id int) error {
-	return ErrNotImplemented
+	return scmd.run("+force_install_dir", scmd.GetAppPath(appid),
+		"+workshop_download_item", strconv.Itoa(appid), strconv.Itoa(id), "validate")
 }
 
 // run helper
 // * exit status 8 - no subscription
 func (scmd *SteamCmd) run(params ...string) error {
+	if scmd.LoginUser == "" || scmd.LoginUser == "anonymous" || scmd.LoginPass == "" {
+		loginParams := []string{"+login", "anonymous"}
+		params = append(loginParams, params...)
+	} else {
+		loginParams := []string{"+login", scmd.LoginUser, scmd.LoginPass}
+		params = append(loginParams, params...)
+	}
 	params = append(params, "+quit")
 
 	task := exec.Command("./steamcmd.sh", params...)
