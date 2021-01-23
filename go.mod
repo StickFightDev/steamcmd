@@ -1,4 +1,4 @@
-module github.com/grunions/steamcmd
+module github.com/StickFightDev/steamcmd
 
 go 1.12
 
